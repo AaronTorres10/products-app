@@ -39,8 +39,9 @@ export const authLogin = async (email: string, password: string) => {
     });
     return returnUserToken(data);
   } catch (error) {
-    console.log(error);
-    throw new Error("User and/or password not valid");
+    // console.log(error);
+    // throw new Error("User and/or password not valid");
+    return null;
   }
 };
 
