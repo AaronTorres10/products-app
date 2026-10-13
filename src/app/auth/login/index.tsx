@@ -1,4 +1,6 @@
 import { ThemedText } from "@/presentation/theme/components/themed-text";
+import ThemedButton from "@/presentation/theme/components/ThemedButton";
+import ThemedLink from "@/presentation/theme/components/ThemedLink";
 import ThemedTextInput from "@/presentation/theme/components/themedTextInput";
 import {
   KeyboardAvoidingView,
@@ -21,7 +23,7 @@ const LoginScreen = () => {
 
         <View style={{ marginTop: 20 }}>
           <ThemedTextInput
-            placeholder="Correp Electrónico"
+            placeholder="Correo Electrónico"
             keyboardType="email-address"
             autoCapitalize="none"
             icon="mail-outline"
@@ -33,6 +35,24 @@ const LoginScreen = () => {
             autoCapitalize="none"
             icon="lock-closed-outline"
           />
+        </View>
+        <View style={{ marginTop: 10 }}></View>
+
+        <ThemedButton icon="arrow-forward">Ingresar</ThemedButton>
+
+        <View style={{ marginTop: 40 }}></View>
+
+        <View
+          style={{
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <ThemedText>¿No tienes cuenta?</ThemedText>
+          <ThemedLink href="/auth/register" style={{ marginHorizontal: 5 }}>
+            Crear una cuenta
+          </ThemedLink>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
