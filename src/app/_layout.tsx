@@ -1,8 +1,9 @@
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from "expo-router";
 
+import { useThemeColor } from "@/presentation/theme/hooks/useThemeColor";
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
-import { useColorScheme } from "react-native";
+import { useColorScheme, View } from "react-native";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -14,6 +15,7 @@ export default function RootLayout() {
   });
 
   const colorScheme = useColorScheme();
+  const backgroundColor = useThemeColor({}, "background");
 
   if (error) {
     throw error;
@@ -26,12 +28,14 @@ export default function RootLayout() {
   SplashScreen.hideAsync();
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      <Stack
-        screenOptions={{
-          headerShown: false,
-        }}
-      />
-    </ThemeProvider>
+    <View style={{ backgroundColor: backgroundColor, flex: 1 }}>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        <Stack
+          screenOptions={{
+            headerShown: false,
+          }}
+        />
+      </ThemeProvider>
+    </View>
   );
 }
