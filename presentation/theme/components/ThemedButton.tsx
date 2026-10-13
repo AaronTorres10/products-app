@@ -21,6 +21,7 @@ const ThemedButton = ({ children, icon, ...rest }: Props) => {
           opacity: pressed ? 0.6 : 1,
         },
       ]}
+      {...rest}
     >
       <Text style={styles.buttonText}>{children}</Text>
 
