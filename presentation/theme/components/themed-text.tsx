@@ -47,9 +47,9 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontFamily: CustomFonts.bold,
-    fontSize: 48,
-    lineHeight: 56,
+    fontFamily: "KanitBold",
+    fontSize: 32,
+    lineHeight: 32,
   },
 
   small: {
