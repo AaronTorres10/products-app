@@ -2,6 +2,9 @@ import { create } from "zustand";
 import {
   authCheckStatus,
   authLogin,
+  authRegister,
+  AuthResult,
+  RegisterInput,
 } from "../../../core/auth/actions/auth-actions";
 import { User } from "../../../core/auth/interface/user";
 import { SecureStorageAdapter } from "../../../helpers/adapters/secure-storage.adapter";
@@ -12,7 +15,8 @@ export interface AuthState {
   token?: string;
   user?: User;
 
-  login: (email: string, password: string) => Promise<boolean>;
+  login: (email: string, password: string) => Promise<AuthResult>;
+  register: (input: RegisterInput) => Promise<AuthResult>;
   checkStatus: () => Promise<void>;
   logout: () => Promise<void>;
 
@@ -44,12 +48,19 @@ export const useAuthStore = create<AuthState>()((set, get) => ({
 
   login: async (email: string, password: string) => {
     const resp = await authLogin(email, password);
-    return get().changeStatus(resp?.token, resp?.user);
+    if (resp.ok) await get().changeStatus(resp.token, resp.user);
+    return resp;
+  },
+
+  register: async (input) => {
+    const resp = await authRegister(input);
+    if (resp.ok) await get().changeStatus(resp.token, resp.user);
+    return resp;
   },
 
   checkStatus: async () => {
     const resp = await authCheckStatus();
-    get().changeStatus(resp?.token, resp?.user);
+    await get().changeStatus(resp?.token, resp?.user);
   },
 
   logout: async () => {

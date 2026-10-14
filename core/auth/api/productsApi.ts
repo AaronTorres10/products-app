@@ -12,6 +12,7 @@ export const API_URL =
 
 const productsApi = axios.create({
   baseURL: API_URL,
+  timeout: 15000,
 });
 
 productsApi.interceptors.request.use(async (config) => {
