@@ -1,11 +1,18 @@
 import { Ionicons } from "@expo/vector-icons";
-import { StyleSheet, TextInput, type TextInputProps, View } from "react-native";
+import {
+  StyleSheet,
+  TextInput,
+  View,
+  type TextInputProps,
+  type ViewStyle,
+} from "react-native";
 
 import { useRef, useState } from "react";
 import { useTheme } from "../hooks/use-theme";
 
-interface Props extends TextInputProps {
+interface Props extends Omit<TextInputProps, "style"> {
   icon?: keyof typeof Ionicons.glyphMap;
+  style?: ViewStyle;
 }
 
 const ThemedTextInput = ({ icon, style, ...rest }: Props) => {
@@ -18,10 +25,13 @@ const ThemedTextInput = ({ icon, style, ...rest }: Props) => {
 
   return (
     <View
-      style={{
-        ...styles.border,
-        borderColor: isActive ? primaryColor : "#ccc",
-      }}
+      style={[
+        {
+          ...styles.border,
+          borderColor: isActive ? primaryColor : "#ccc",
+        },
+        style,
+      ]}
       onTouchStart={() => inputRef.current?.focus()}
     >
       {icon && (
@@ -55,7 +65,7 @@ const styles = StyleSheet.create({
   border: {
     borderWidth: 1,
     borderRadius: 5,
-    padding: 5,
+    padding: 10,
     marginBottom: 10,
     flexDirection: "row",
     alignItems: "center",
