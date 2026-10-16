@@ -17,6 +17,7 @@ import { useThemeColor } from "@/presentation/theme/hooks/useThemeColor";
 
 import { useCameraStore } from "@/presentation/store/useCameraStore";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
+import * as ImagePicker from "expo-image-picker";
 import * as MediaLibrary from "expo-media-library/legacy";
 
 export default function CameraScreen() {
@@ -84,7 +85,7 @@ export default function CameraScreen() {
   const onShutterButtomPress = async () => {
     if (!cameraRef.current) return;
     const picture = await cameraRef.current.takePictureAsync({
-      quality: 0.8,
+      quality: 0.7,
     });
     console.log(picture);
     if (!picture?.uri) return;
@@ -115,6 +116,23 @@ export default function CameraScreen() {
     }
   };
 
+  const onPickImages = async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      quality: 0.5,
+      aspect: [4, 3],
+      //allowsEditing: true,
+      allowsMultipleSelection: true,
+      selectionLimit: 4,
+    });
+    if (result.canceled) return;
+
+    result.assets.forEach((asset) => {
+      addSelectedImage(asset.uri);
+    });
+    router.dismiss();
+  };
+
   function toggleCameraFacing() {
     setFacing((current) => (current === "back" ? "front" : "back"));
   }
@@ -142,7 +160,7 @@ export default function CameraScreen() {
       <CameraView ref={cameraRef} style={styles.camera} facing={facing} />
       <ShutterButton onPress={onShutterButtomPress} />
       <FlipCameraButton onPress={toggleCameraFacing} />
-      <GalleryButton />
+      <GalleryButton onPress={onPickImages} />
 
       <ReturnCancelButton onPress={onReturnCancel} />
 
