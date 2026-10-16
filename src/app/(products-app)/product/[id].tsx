@@ -1,11 +1,16 @@
 import ProductImages from "@/presentation/products/components/ProductImages";
 import { useProduct } from "@/presentation/products/hooks/useProduct";
+import MenuIconButton from "@/presentation/theme/components/MenuIconButton";
 import ThemeButtonGroup from "@/presentation/theme/components/ThemeButtonGroup";
 import { ThemedView } from "@/presentation/theme/components/themed-view";
 import ThemedButton from "@/presentation/theme/components/ThemedButton";
 import ThemedTextInput from "@/presentation/theme/components/themedTextInput";
-import { Ionicons } from "@expo/vector-icons";
-import { Redirect, useLocalSearchParams, useNavigation } from "expo-router";
+import {
+  Redirect,
+  router,
+  useLocalSearchParams,
+  useNavigation,
+} from "expo-router";
 import { Formik } from "formik";
 import { useEffect } from "react";
 import {
@@ -26,7 +31,9 @@ const ProductScreen = () => {
 
   useEffect(() => {
     navigation.setOptions({
-      headerRight: () => <Ionicons name="camera-outline" size={25} />,
+      headerRight: () => (
+        <MenuIconButton onPress={() => router.push("/camera")} icon="camera" />
+      ),
     });
   }, []);
 
