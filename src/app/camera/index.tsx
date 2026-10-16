@@ -15,10 +15,13 @@ import { router } from "expo-router";
 import { ThemedText } from "@/presentation/theme/components/themed-text";
 import { useThemeColor } from "@/presentation/theme/hooks/useThemeColor";
 
+import { useCameraStore } from "@/presentation/store/useCameraStore";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
 import * as MediaLibrary from "expo-media-library/legacy";
 
 export default function CameraScreen() {
+  const { addSelectedImage } = useCameraStore();
+
   const [facing, setFacing] = useState<CameraType>("back");
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
   const [mediaPermission, requestMediaPermission] =
@@ -90,8 +93,26 @@ export default function CameraScreen() {
 
   const onPictureAccepted = async () => {
     if (!selectedImage) return;
-    await MediaLibrary.createAssetAsync(selectedImage);
-    router.dismiss();
+
+    try {
+      const { status } = await MediaLibrary.requestPermissionsAsync(true);
+
+      if (status !== "granted") {
+        Alert.alert(
+          "Permiso requerido",
+          "Necesitamos permiso para guardar fotos en la galería.",
+        );
+        return;
+      }
+
+      await MediaLibrary.createAssetAsync(selectedImage);
+
+      addSelectedImage(selectedImage);
+      router.dismiss();
+    } catch (error) {
+      console.log("Error al guardar imagen:", error);
+      Alert.alert("Error", "No se pudo guardar la imagen.");
+    }
   };
 
   function toggleCameraFacing() {
