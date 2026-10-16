@@ -1,6 +1,8 @@
 import { ThemedText } from "@/presentation/theme/components/themed-text";
 import { useThemeColor } from "@/presentation/theme/hooks/useThemeColor";
+import { Ionicons } from "@expo/vector-icons";
 import { CameraType, CameraView, useCameraPermissions } from "expo-camera";
+import { router } from "expo-router";
 import { useRef, useState } from "react";
 import {
   StyleSheet,
@@ -55,10 +57,18 @@ export default function CameraScreen() {
     setFacing((current) => (current === "back" ? "front" : "back"));
   }
 
+  const onReturnCancel = () => {
+    router.dismiss();
+  };
+
   return (
     <View style={styles.container}>
       <CameraView ref={cameraRef} style={styles.camera} facing={facing} />
       <ShutterButton onPress={onShutterButtomPress} />
+      <FlipCameraButton onPress={toggleCameraFacing} />
+      <GalleryButton />
+
+      <ReturnCancelButton onPress={onReturnCancel} />
 
       {/* <TouchableOpacity style={styles.button} onPress={toggleCameraFacing}>
           <Text style={styles.text}>Flip Camera</Text>
@@ -83,6 +93,28 @@ const ShutterButton = ({ onPress = () => {} }) => {
         },
       ]}
     ></TouchableOpacity>
+  );
+};
+
+const FlipCameraButton = ({ onPress = () => {} }) => {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.flipCameraButton}>
+      <Ionicons name="camera-reverse-outline" size={30} color="white" />
+    </TouchableOpacity>
+  );
+};
+const GalleryButton = ({ onPress = () => {} }) => {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.galleryButton}>
+      <Ionicons name="images-outline" size={30} color="white" />
+    </TouchableOpacity>
+  );
+};
+const ReturnCancelButton = ({ onPress = () => {} }) => {
+  return (
+    <TouchableOpacity onPress={onPress} style={styles.returnCancelButton}>
+      <Ionicons name="arrow-back-outline" size={30} color="white" />
+    </TouchableOpacity>
   );
 };
 
