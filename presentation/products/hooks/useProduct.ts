@@ -1,10 +1,15 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useRef } from "react";
 import { Alert } from "react-native";
 import { updateCreateProduct } from "../../../core/products/actions/create-update-product.action";
 import { getProductsById } from "../../../core/products/actions/get-product-by-id.action";
 import { Product } from "../../../core/products/interface/product.interface";
 
 export const useProduct = (productId: string) => {
+  const queryClient = useQueryClient();
+
+  const productIdRef = useRef(productId); // => new / UUID
+
   const productQuery = useQuery({
     queryKey: ["products", productId],
     queryFn: () => getProductsById(productId),
@@ -13,8 +18,22 @@ export const useProduct = (productId: string) => {
 
   // Mutación
   const productMutation = useMutation({
-    mutationFn: async (data: Product) => updateCreateProduct(data),
+    mutationFn: async (data: Product) =>
+      updateCreateProduct({
+        ...data,
+        id: productIdRef.current,
+      }),
+
     onSuccess(data: Product) {
+      productIdRef.current = data.id;
+
+      queryClient.invalidateQueries({
+        queryKey: ["products", "infinite"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["products", data.id],
+      });
+
       Alert.alert("Producto guardado", `${data.title} se guardo correctamente`);
     },
   });
