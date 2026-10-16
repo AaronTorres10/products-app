@@ -1,5 +1,6 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { Alert } from "react-native";
+import { updateCreateProduct } from "../../../core/products/actions/create-update-product.action";
 import { getProductsById } from "../../../core/products/actions/get-product-by-id.action";
 import { Product } from "../../../core/products/interface/product.interface";
 
@@ -12,11 +13,7 @@ export const useProduct = (productId: string) => {
 
   // Mutación
   const productMutation = useMutation({
-    mutationFn: async (data: Product) => {
-      console.log({ data });
-
-      return data;
-    },
+    mutationFn: async (data: Product) => updateCreateProduct(data),
     onSuccess(data: Product) {
       Alert.alert("Producto guardado", `${data.title} se guardo correctamente`);
     },
