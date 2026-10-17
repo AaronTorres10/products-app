@@ -1,3 +1,4 @@
+import { useCameraStore } from "@/presentation/store/useCameraStore";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useRef } from "react";
 import { Alert } from "react-native";
@@ -6,6 +7,8 @@ import { getProductsById } from "../../../core/products/actions/get-product-by-i
 import { Product } from "../../../core/products/interface/product.interface";
 
 export const useProduct = (productId: string) => {
+  const { clearImages } = useCameraStore();
+
   const queryClient = useQueryClient();
 
   const productIdRef = useRef(productId); // => new / UUID
@@ -26,6 +29,8 @@ export const useProduct = (productId: string) => {
 
     onSuccess(data: Product) {
       productIdRef.current = data.id;
+
+      clearImages();
 
       queryClient.invalidateQueries({
         queryKey: ["products", "infinite"],
