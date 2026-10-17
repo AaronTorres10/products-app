@@ -3,104 +3,159 @@ import { ThemedText } from "@/presentation/theme/components/themed-text";
 import ThemedButton from "@/presentation/theme/components/ThemedButton";
 import ThemedLink from "@/presentation/theme/components/ThemedLink";
 import ThemedTextInput from "@/presentation/theme/components/themedTextInput";
-import { useThemeColor } from "@/presentation/theme/hooks/useThemeColor";
+import { useTheme } from "@/presentation/theme/hooks/use-theme";
+import { Ionicons } from "@expo/vector-icons";
 import { router } from "expo-router";
 import { useState } from "react";
 import {
-  Alert,
   KeyboardAvoidingView,
+  Platform,
   ScrollView,
-  useWindowDimensions,
+  StyleSheet,
   View,
 } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 const LoginScreen = () => {
   const { login } = useAuthStore();
-
-  const { height } = useWindowDimensions();
-
-  const backgroundColor = useThemeColor({}, "background");
-
+  const theme = useTheme();
+  const { top, bottom } = useSafeAreaInsets();
   const [isPosting, setIsPosting] = useState(false);
-
-  const [form, setForm] = useState({
-    email: "",
-    password: "",
-  });
+  const [error, setError] = useState("");
+  const [form, setForm] = useState({ email: "", password: "" });
 
   const onLogin = async () => {
-    const { email, password } = form;
-    console.log({ email, password });
+    if (isPosting) return;
+    const email = form.email.trim();
+    const { password } = form;
+    setError("");
 
-    if (email.length === 0 || password.length === 0) {
+    if (!email || !password) {
+      setError("Escribe tu correo y contraseña para continuar.");
       return;
     }
 
     setIsPosting(true);
-    const wasSuccessful = await login(email, password);
-    setIsPosting(false);
-
-    if (wasSuccessful) {
-      router.replace("/");
-      return;
+    try {
+      const wasSuccessful = await login(email, password);
+      if (wasSuccessful) {
+        router.replace("/");
+        return;
+      }
+      setError("No pudimos iniciar sesión. Verifica tu correo y contraseña.");
+    } catch {
+      setError("No pudimos conectar. Intenta nuevamente en un momento.");
+    } finally {
+      setIsPosting(false);
     }
-    Alert.alert("Error", "Usuario o contraseña no son correctos");
   };
 
   return (
-    <KeyboardAvoidingView behavior="padding" style={{ flex: 1 }}>
+    <KeyboardAvoidingView
+      behavior={Platform.OS === "ios" ? "padding" : undefined}
+      style={[styles.container, { backgroundColor: theme.background }]}
+    >
       <ScrollView
-        style={{ paddingHorizontal: 40, backgroundColor: backgroundColor }}
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={[
+          styles.scroll,
+          {
+            paddingTop: Math.max(top, 24),
+            paddingBottom: Math.max(bottom, 24),
+          },
+        ]}
       >
-        <View style={{ paddingTop: height * 0.35 }}>
-          <ThemedText type="title">Ingresar</ThemedText>
-          <ThemedText style={{ color: "grey" }}>
-            Por favor ingrese para poder continuar
+        <View style={styles.content}>
+          <View
+            style={[
+              styles.brandIcon,
+              { backgroundColor: theme.backgroundSelected },
+            ]}
+          >
+            <Ionicons name="cube-outline" size={34} color={theme.primary} />
+          </View>
+          <ThemedText
+            type="smallBold"
+            themeColor="primary"
+            style={styles.eyebrow}
+          ></ThemedText>
+          <ThemedText type="title" style={styles.title}>
+            Todo en su lugar.
           </ThemedText>
-        </View>
+          <ThemedText themeColor="textSecondary" style={styles.intro}>
+            Administra tu catálogo en un solo lugar, con cada detalle bajo
+            control.
+          </ThemedText>
 
-        <View style={{ marginTop: 20 }}>
-          <ThemedTextInput
-            placeholder="Correo Electrónico"
-            keyboardType="email-address"
-            autoCapitalize="none"
-            icon="mail-outline"
-            value={form.email}
-            onChangeText={(value) => setForm({ ...form, email: value })}
-          />
+          <View
+            style={[
+              styles.form,
+              {
+                backgroundColor: theme.backgroundElement,
+                borderColor: theme.border,
+              },
+            ]}
+          >
+            <ThemedText type="subtitle" style={styles.formTitle}>
+              Inicia sesión
+            </ThemedText>
+            <ThemedTextInput
+              label="Correo electrónico"
+              placeholder="tu@correo.com"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              autoComplete="email"
+              icon="mail-outline"
+              editable={!isPosting}
+              value={form.email}
+              onChangeText={(value) => setForm({ ...form, email: value })}
+            />
+            <ThemedTextInput
+              label="Contraseña"
+              placeholder="Escribe tu contraseña"
+              secureTextEntry
+              autoCapitalize="none"
+              autoComplete="current-password"
+              icon="lock-closed-outline"
+              editable={!isPosting}
+              value={form.password}
+              onChangeText={(value) => setForm({ ...form, password: value })}
+              returnKeyType="go"
+              onSubmitEditing={onLogin}
+            />
+            {!!error && (
+              <ThemedText
+                accessibilityRole="alert"
+                type="small"
+                themeColor="danger"
+                style={styles.error}
+              >
+                {error}
+              </ThemedText>
+            )}
+            <ThemedButton
+              onPress={onLogin}
+              loading={isPosting}
+              icon="arrow-forward"
+            >
+              {isPosting ? "Ingresando" : "Ingresar"}
+            </ThemedButton>
+          </View>
 
-          <ThemedTextInput
-            placeholder="Contraseña"
-            secureTextEntry
-            autoCapitalize="none"
-            icon="lock-closed-outline"
-            value={form.password}
-            onChangeText={(value) => setForm({ ...form, password: value })}
-          />
-        </View>
-        <View style={{ marginTop: 10 }}></View>
-
-        <ThemedButton
-          onPress={onLogin}
-          disabled={isPosting}
-          icon="arrow-forward"
-        >
-          Ingresar
-        </ThemedButton>
-
-        <View style={{ marginTop: 40 }}></View>
-
-        <View
-          style={{
-            flexDirection: "row",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          <ThemedText>¿No tienes cuenta?</ThemedText>
-          <ThemedLink href="/auth/register" style={{ marginHorizontal: 5 }}>
-            Crear una cuenta
-          </ThemedLink>
+          <View style={styles.links}>
+            <ThemedText type="small" themeColor="textSecondary">
+              ¿No tienes cuenta?
+            </ThemedText>
+            <ThemedLink href="/auth/register">Crear una cuenta</ThemedLink>
+          </View>
+          <ThemedText
+            type="small"
+            themeColor="textSecondary"
+            style={styles.caption}
+          >
+            Tu catálogo. Tu siguiente gran idea.
+          </ThemedText>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -108,3 +163,32 @@ const LoginScreen = () => {
 };
 
 export default LoginScreen;
+
+const styles = StyleSheet.create({
+  container: { flex: 1 },
+  scroll: { flexGrow: 1, justifyContent: "center", paddingHorizontal: 24 },
+  content: { width: "100%", maxWidth: 440, alignSelf: "center" },
+  brandIcon: {
+    width: 72,
+    height: 72,
+    borderRadius: 24,
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 24,
+  },
+  eyebrow: { fontSize: 11, letterSpacing: 2 },
+  title: { marginTop: 10, marginBottom: 12 },
+  intro: { marginBottom: 28 },
+  form: { padding: 20, borderWidth: 1, borderRadius: 24 },
+  formTitle: { marginBottom: 20 },
+  error: { marginBottom: 16 },
+  links: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 6,
+    marginTop: 24,
+  },
+  caption: { textAlign: "center", marginTop: 32 },
+});

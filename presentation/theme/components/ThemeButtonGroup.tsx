@@ -1,65 +1,72 @@
+import { CustomFonts } from "@/constants/theme";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { useThemeColor } from "../hooks/useThemeColor";
+import { useTheme } from "../hooks/use-theme";
 
 interface Props {
   options: string[];
   selectedOptions: string[];
-
-  onSelect: (options: string) => void;
+  labels?: Record<string, string>;
+  onSelect: (option: string) => void;
 }
 
-const ThemedButtonGroup = ({ options, selectedOptions, onSelect }: Props) => {
-  const primaryColor = useThemeColor({}, "primary");
+const ThemedButtonGroup = ({
+  options,
+  selectedOptions,
+  labels,
+  onSelect,
+}: Props) => {
+  const theme = useTheme();
 
   return (
     <View style={styles.container}>
-      {options.map((option) => (
-        <TouchableOpacity
-          key={option}
-          onPress={() => onSelect(option)}
-          style={[
-            styles.button,
-            selectedOptions.includes(option) && {
-              backgroundColor: primaryColor,
-            },
-          ]}
-        >
-          <Text
-            adjustsFontSizeToFit
-            numberOfLines={1}
+      {options.map((option) => {
+        const selected = selectedOptions.includes(option);
+
+        return (
+          <TouchableOpacity
+            key={option}
+            accessibilityRole="button"
+            accessibilityState={{ selected }}
+            activeOpacity={0.7}
+            onPress={() => onSelect(option)}
             style={[
-              styles.buttonText,
-              selectedOptions.includes(option) && styles.selectedButtonText,
+              styles.button,
+              {
+                borderColor: selected ? theme.primary : theme.border,
+                backgroundColor: selected
+                  ? theme.backgroundSelected
+                  : theme.backgroundElement,
+              },
             ]}
           >
-            {option[0].toUpperCase() + option.slice(1)}
-          </Text>
-        </TouchableOpacity>
-      ))}
+            <Text
+              style={[
+                styles.buttonText,
+                { color: selected ? theme.primary : theme.textSecondary },
+              ]}
+            >
+              {labels?.[option] ?? option}
+            </Text>
+          </TouchableOpacity>
+        );
+      })}
     </View>
   );
 };
+
 export default ThemedButtonGroup;
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    flex: 1,
-  },
+  container: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   button: {
-    padding: 10,
-    margin: 5,
-    borderRadius: 5,
+    minWidth: 44,
+    minHeight: 44,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderWidth: 1,
+    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    flex: 1,
   },
-  buttonText: {
-    fontSize: 16,
-  },
-  selectedButtonText: {
-    color: "#fff",
-  },
+  buttonText: { fontFamily: CustomFonts.regular, fontSize: 14 },
 });

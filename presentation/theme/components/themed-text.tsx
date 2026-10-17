@@ -31,6 +31,9 @@ export function ThemedText({
         type === "default" && styles.default,
         type === "title" && styles.title,
         type === "small" && styles.small,
+        type === "subtitle" && styles.subtitle,
+        type === "smallBold" && styles.smallBold,
+        (type === "link" || type === "linkPrimary") && styles.link,
 
         style,
       ]}
@@ -49,11 +52,29 @@ const styles = StyleSheet.create({
   title: {
     fontFamily: "KanitBold",
     fontSize: 32,
-    lineHeight: 32,
+    lineHeight: 40,
+  },
+
+  subtitle: {
+    fontFamily: CustomFonts.bold,
+    fontSize: 20,
+    lineHeight: 28,
+  },
+
+  smallBold: {
+    fontFamily: CustomFonts.bold,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+
+  link: {
+    fontFamily: CustomFonts.regular,
+    fontSize: 16,
+    lineHeight: 24,
   },
 
   small: {
-    fontFamily: CustomFonts.thin,
+    fontFamily: CustomFonts.regular,
     fontSize: 14,
     lineHeight: 20,
   },

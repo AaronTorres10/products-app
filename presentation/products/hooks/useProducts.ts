@@ -9,11 +9,16 @@ export const useProducts = () => {
     staleTime: 1000 * 60 * 60,
 
     initialPageParam: 0,
-    getNextPageParam: (lastPage, allPages) => allPages.length,
+    getNextPageParam: (lastPage, allPages) =>
+      lastPage.length < 20 ? undefined : allPages.length,
   });
 
   return {
     productsQuery,
-    loadNextPage: productsQuery.fetchNextPage,
+    loadNextPage: () => {
+      if (productsQuery.hasNextPage && !productsQuery.isFetching) {
+        productsQuery.fetchNextPage();
+      }
+    },
   };
 };

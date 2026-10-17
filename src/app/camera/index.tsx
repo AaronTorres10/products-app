@@ -25,8 +25,7 @@ export default function CameraScreen() {
 
   const [facing, setFacing] = useState<CameraType>("back");
   const [cameraPermission, requestCameraPermission] = useCameraPermissions();
-  const [mediaPermission, requestMediaPermission] =
-    MediaLibrary.usePermissions();
+  const [, requestMediaPermission] = MediaLibrary.usePermissions();
   const [selectedImage, setSelectedImage] = useState<string>();
 
   const cameraRef = useRef<CameraView>(null);
@@ -85,9 +84,9 @@ export default function CameraScreen() {
   const onShutterButtomPress = async () => {
     if (!cameraRef.current) return;
     const picture = await cameraRef.current.takePictureAsync({
-      quality: 0.7,
+      quality: 0.8,
     });
-    console.log(picture);
+    //console.log(picture);
     if (!picture?.uri) return;
     setSelectedImage(picture.uri);
   };

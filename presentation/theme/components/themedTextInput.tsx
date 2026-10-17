@@ -1,60 +1,90 @@
+import { CustomFonts } from "@/constants/theme";
 import { Ionicons } from "@expo/vector-icons";
+import { useRef, useState } from "react";
 import {
   StyleSheet,
+  Text,
   TextInput,
   View,
   type TextInputProps,
   type ViewStyle,
 } from "react-native";
 
-import { useRef, useState } from "react";
 import { useTheme } from "../hooks/use-theme";
 
 interface Props extends Omit<TextInputProps, "style"> {
   icon?: keyof typeof Ionicons.glyphMap;
+  label?: string;
+  error?: string;
   style?: ViewStyle;
 }
 
-const ThemedTextInput = ({ icon, style, ...rest }: Props) => {
+const ThemedTextInput = ({
+  icon,
+  label,
+  error,
+  style,
+  onFocus,
+  onBlur,
+  multiline,
+  ...rest
+}: Props) => {
   const theme = useTheme();
-
-  const primaryColor = theme.primary;
-  const textColor = theme.text;
   const [isActive, setIsActive] = useState(false);
   const inputRef = useRef<TextInput>(null);
 
   return (
-    <View
-      style={[
-        {
-          ...styles.border,
-          borderColor: isActive ? primaryColor : "#ccc",
-        },
-        style,
-      ]}
-      onTouchStart={() => inputRef.current?.focus()}
-    >
-      {icon && (
-        <Ionicons
-          name={icon}
-          size={24}
-          color={textColor}
-          style={{ marginRight: 10 }}
-        />
+    <View style={[styles.container, style]}>
+      {label && (
+        <Text style={[styles.label, { color: theme.text }]}>{label}</Text>
       )}
-
-      <TextInput
-        ref={inputRef}
-        placeholderTextColor="#5c5c5c"
-        onFocus={() => setIsActive(true)}
-        onBlur={() => setIsActive(false)}
-        style={{
-          color: textColor,
-          marginRight: 10,
-          flex: 1,
-        }}
-        {...rest}
-      />
+      <View
+        style={[
+          styles.border,
+          {
+            backgroundColor: theme.backgroundElement,
+            borderColor: error
+              ? theme.danger
+              : isActive
+                ? theme.primary
+                : theme.border,
+          },
+          multiline && styles.multiline,
+        ]}
+        onTouchStart={() => inputRef.current?.focus()}
+      >
+        {icon && <Ionicons name={icon} size={20} color={theme.textSecondary} />}
+        <TextInput
+          {...rest}
+          ref={inputRef}
+          accessibilityLabel={
+            rest.accessibilityLabel ?? label ?? rest.placeholder
+          }
+          placeholderTextColor={theme.textSecondary}
+          multiline={multiline}
+          onFocus={(event) => {
+            setIsActive(true);
+            onFocus?.(event);
+          }}
+          onBlur={(event) => {
+            setIsActive(false);
+            onBlur?.(event);
+          }}
+          style={[
+            styles.input,
+            { color: theme.text },
+            multiline && styles.multilineInput,
+          ]}
+        />
+      </View>
+      {!!error && (
+        <Text
+          accessibilityRole="alert"
+          style={[styles.error, { color: theme.danger }]}
+        >
+          {error}
+        </Text>
+      )}
     </View>
   );
 };
@@ -62,16 +92,25 @@ const ThemedTextInput = ({ icon, style, ...rest }: Props) => {
 export default ThemedTextInput;
 
 const styles = StyleSheet.create({
+  container: { marginBottom: 16 },
+  label: { fontFamily: CustomFonts.regular, fontSize: 14, marginBottom: 8 },
   border: {
+    minHeight: 54,
     borderWidth: 1,
-    borderRadius: 5,
-    padding: 10,
-    marginBottom: 10,
+    borderRadius: 14,
+    paddingHorizontal: 14,
     flexDirection: "row",
     alignItems: "center",
+    gap: 10,
   },
   input: {
     flex: 1,
-    paddingVertical: 5,
+    minWidth: 0,
+    fontFamily: CustomFonts.regular,
+    fontSize: 16,
+    paddingVertical: 14,
   },
+  multiline: { alignItems: "flex-start" },
+  multilineInput: { minHeight: 120, textAlignVertical: "top" },
+  error: { fontFamily: CustomFonts.regular, fontSize: 13, marginTop: 6 },
 });

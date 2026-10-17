@@ -8,7 +8,12 @@ const LogoutIconButton = () => {
   const { logout } = useAuthStore();
 
   return (
-    <TouchableOpacity style={{ marginRight: 8 }} onPress={logout}>
+    <TouchableOpacity
+      accessibilityRole="button"
+      accessibilityLabel="Cerrar sesión"
+      style={{ padding: 10 }}
+      onPress={logout}
+    >
       <Ionicons name="log-out-outline" size={24} color={primaryColor} />
     </TouchableOpacity>
   );

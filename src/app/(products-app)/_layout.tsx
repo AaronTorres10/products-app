@@ -1,17 +1,18 @@
 import LogoutIconButton from "@/presentation/auth/components/LogoutIconButton";
 import { useAuthStore } from "@/presentation/auth/store/useAuthStore";
-import { useThemeColor } from "@/presentation/theme/hooks/useThemeColor";
+import { CustomFonts } from "@/constants/theme";
+import { useTheme } from "@/presentation/theme/hooks/use-theme";
 import { Redirect, Stack } from "expo-router";
 import { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
 
 const CheckAuthenticationLayout = () => {
   const { status, checkStatus } = useAuthStore();
-  const backgroundColor = useThemeColor({}, "background");
+  const theme = useTheme();
 
   useEffect(() => {
     checkStatus();
-  }, []);
+  }, [checkStatus]);
   if (status === "checking") {
     return (
       <View
@@ -34,25 +35,28 @@ const CheckAuthenticationLayout = () => {
     <Stack
       screenOptions={{
         headerShadowVisible: false,
+        headerTintColor: theme.text,
+        headerTitleStyle: { fontFamily: CustomFonts.regular, fontSize: 16 },
         headerStyle: {
-          backgroundColor: backgroundColor,
+          backgroundColor: theme.background,
         },
         contentStyle: {
-          backgroundColor: backgroundColor,
+          backgroundColor: theme.background,
         },
       }}
     >
       <Stack.Screen
         name="(home)/index"
         options={{
-          title: "Productos",
-          headerLeft: () => <LogoutIconButton />,
+          title: "Products Manager",
+          headerRight: () => <LogoutIconButton />,
         }}
       />
       <Stack.Screen
         name="product/[id]"
         options={{
           title: "Producto",
+          headerBackTitle: "Catálogo",
         }}
       />
     </Stack>
